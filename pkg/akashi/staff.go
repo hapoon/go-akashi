@@ -11,7 +11,7 @@ import (
 	"strconv"
 )
 
-// Staff information struct
+// Staff スタッフ情報
 type Staff struct {
 	ID                   int                `json:"staffId"`              // 従業員ID
 	LastName             string             `json:"lastName"`             // 姓
@@ -104,7 +104,7 @@ func GetStaff(ctx context.Context, param GetStaffParam) (GetStaffResponse, error
 		return GetStaffResponse{}, err
 	}
 	if !gsr.Success {
-		return GetStaffResponse{}, errors.New("Requesting AKASHI API failed")
+		return GetStaffResponse{}, errors.New("Requesting Staff API failed")
 	}
 	return gsr.Response, nil
 }

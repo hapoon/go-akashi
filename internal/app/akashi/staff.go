@@ -6,7 +6,7 @@ import (
 	"log"
 	"os"
 
-	"hapoon/go-akashi/pkg/go-akashi"
+	"hapoon/go-akashi/pkg/akashi"
 
 	"github.com/spf13/cobra"
 )
