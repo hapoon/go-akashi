@@ -11,8 +11,6 @@ import (
 )
 
 func init() {
-	alertCmd.Flags().StringVar(&loginCompanyCode, "company-code", "", "Login company code")
-	alertCmd.Flags().StringVarP(&accessToken, "token", "t", "", "Access token")
 	rootCmd.AddCommand(alertCmd)
 }
 

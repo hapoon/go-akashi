@@ -12,8 +12,6 @@ import (
 )
 
 func init() {
-	staffCmd.Flags().StringVar(&loginCompanyCode, "company-code", "", "Login company code")
-	staffCmd.Flags().StringVarP(&accessToken, "token", "t", "", "Access token")
 	staffCmd.Flags().IntVar(&staffID, "staff-id", 0, "Staff ID")
 	staffCmd.Flags().StringVar(&target, "target", "", "Target staff ID")
 	staffCmd.Flags().IntVar(&page, "page", 0, "Page number")

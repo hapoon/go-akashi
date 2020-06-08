@@ -7,9 +7,14 @@ import (
 	"github.com/spf13/cobra"
 )
 
+func init() {
+	rootCmd.PersistentFlags().StringVar(&loginCompanyCode, "company-code", "", "Login company code")
+	rootCmd.PersistentFlags().StringVarP(&accessToken, "token", "t", "", "Access token")
+}
+
 var rootCmd = &cobra.Command{
-	Use:   "go-akashi",
-	Short: "Go-akashi is a command line tool for AKASHI",
+	Use:   "akactl",
+	Short: "akactl is a command line tool for AKASHI",
 	Long: `A command line tool for AKASHI
 			Complete documentation is available at ...`,
 	Run: func(cmd *cobra.Command, args []string) {
