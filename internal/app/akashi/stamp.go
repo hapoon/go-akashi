@@ -23,13 +23,16 @@ var (
 )
 
 func init() {
+	// 打刻情報取得
 	stampGetCmd.Flags().StringVarP(&startDate, "start-date", "s", "", "Start date")
 	stampGetCmd.Flags().StringVarP(&endDate, "end-date", "e", "", "End date")
 	stampCmd.AddCommand(stampGetCmd)
-	stampPostCmd.Flags().IntVar(&stampType, "type", 0, "Stamp type")
-	//stampPostCmd.Flags().StringVar(&stampedAt, "stamped-at", "", "クライアントでの打刻日時")
-	//stampPostCmd.Flags().StringVar(&timezone, "timezone", "", "タイムゾーン")
-	stampCmd.AddCommand(stampPostCmd)
+	// 打刻
+	stampCmd.AddCommand(stampTouchCmd)
+	stampCmd.AddCommand(stampGoToWorkCmd)
+	stampCmd.AddCommand(stampLeaveWorkCmd)
+	stampCmd.AddCommand(stampBreakCmd)
+	stampCmd.AddCommand(stampBreakReturnCmd)
 	rootCmd.AddCommand(stampCmd)
 }
 
@@ -38,15 +41,18 @@ var stampCmd = &cobra.Command{
 	Short: "Access stamp API",
 	Long:  `Access stamp API`,
 	Run: func(cmd *cobra.Command, args []string) {
-
+		// このコマンド単体では動作しないのでヘルプを表示する
 	},
 }
 
 var stampGetCmd = &cobra.Command{
 	Use:   "get",
-	Short: "Get stamp information by stamp API",
-	Long:  `Get stamp information by stamp API`,
+	Short: "打刻情報の取得",
+	Long:  `打刻情報の取得`,
 	Run: func(cmd *cobra.Command, args []string) {
+		if verbose {
+			log.Println("args:", args)
+		}
 		ctx := context.Background()
 		ts, err := time.Parse(akashi.DateFormat, startDate)
 		if err != nil {
@@ -88,25 +94,111 @@ var stampGetCmd = &cobra.Command{
 	},
 }
 
-var stampPostCmd = &cobra.Command{
-	Use:   "post",
-	Short: "Post stamp by stamp API",
-	Long:  "Post stamp by stamp API",
+var stampTouchCmd = &cobra.Command{
+	Use:   "touch",
+	Short: "打刻",
+	Long: `打刻
+	状況に合わせた打刻を行います。
+	未出勤時は出勤の打刻を、出勤時は退勤の打刻を、休憩中は休憩戻りの打刻を行います。
+	`,
 	Run: func(cmd *cobra.Command, args []string) {
 		ctx := context.Background()
 		p := akashi.PostStampParam{
 			LoginCompanyCode: loginCompanyCode,
 			Token:            accessToken,
-			Type:             akashi.StampType(stampType),
 		}
 		res, err := akashi.PostStamp(ctx, p)
 		if err != nil {
 			log.Fatalln(err)
 			os.Exit(1)
 		}
-		fmt.Println("企業ID:", res.LoginCompanyCode)
-		fmt.Println("従業員ID:", res.StaffID)
-		fmt.Println("打刻種別:", res.Type)
-		fmt.Println("打刻日時:", res.StampedAt)
+		printStampPostResponse(res)
 	},
+}
+
+var stampGoToWorkCmd = &cobra.Command{
+	Use:   "work-in",
+	Short: "出勤の打刻",
+	Long:  "出勤の打刻",
+	Run: func(cmd *cobra.Command, args []string) {
+		ctx := context.Background()
+		p := akashi.PostStampParam{
+			LoginCompanyCode: loginCompanyCode,
+			Token:            accessToken,
+			Type:             akashi.StampTypeGoToWork,
+		}
+		res, err := akashi.PostStamp(ctx, p)
+		if err != nil {
+			log.Fatalln(err)
+			os.Exit(1)
+		}
+		printStampPostResponse(res)
+	},
+}
+
+var stampLeaveWorkCmd = &cobra.Command{
+	Use:   "work-out",
+	Short: "退勤の打刻",
+	Long:  "退勤の打刻",
+	Run: func(cmd *cobra.Command, args []string) {
+		ctx := context.Background()
+		p := akashi.PostStampParam{
+			LoginCompanyCode: loginCompanyCode,
+			Token:            accessToken,
+			Type:             akashi.StampTypeLeaveWork,
+		}
+		res, err := akashi.PostStamp(ctx, p)
+		if err != nil {
+			log.Fatalln(err)
+			os.Exit(1)
+		}
+		printStampPostResponse(res)
+	},
+}
+
+var stampBreakCmd = &cobra.Command{
+	Use:   "break-in",
+	Short: "休憩入りの打刻",
+	Long:  "休憩入りの打刻",
+	Run: func(cmd *cobra.Command, args []string) {
+		ctx := context.Background()
+		p := akashi.PostStampParam{
+			LoginCompanyCode: loginCompanyCode,
+			Token:            accessToken,
+			Type:             akashi.StampTypeBreak,
+		}
+		res, err := akashi.PostStamp(ctx, p)
+		if err != nil {
+			log.Fatalln(err)
+			os.Exit(1)
+		}
+		printStampPostResponse(res)
+	},
+}
+
+var stampBreakReturnCmd = &cobra.Command{
+	Use:   "break-out",
+	Short: "休憩戻りの打刻",
+	Long:  "休憩戻りの打刻",
+	Run: func(cmd *cobra.Command, args []string) {
+		ctx := context.Background()
+		p := akashi.PostStampParam{
+			LoginCompanyCode: loginCompanyCode,
+			Token:            accessToken,
+			Type:             akashi.StampTypeBreakReturn,
+		}
+		res, err := akashi.PostStamp(ctx, p)
+		if err != nil {
+			log.Fatalln(err)
+			os.Exit(1)
+		}
+		printStampPostResponse(res)
+	},
+}
+
+func printStampPostResponse(res akashi.PostStampResponse) {
+	fmt.Println("企業ID:", res.LoginCompanyCode)
+	fmt.Println("従業員ID:", res.StaffID)
+	fmt.Println("打刻種別:", res.Type)
+	fmt.Println("打刻日時:", res.StampedAt)
 }

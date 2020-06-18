@@ -29,7 +29,11 @@ var alertCmd = &cobra.Command{
 			log.Fatalln(err)
 			os.Exit(1)
 		}
-		fmt.Println("response:")
-		fmt.Printf("%+v\n", res)
+		fmt.Println("企業ID:", res.LoginCompanyCode)
+		fmt.Println("従業員ID:", res.StaffID)
+		fmt.Println("アラート件数:", res.Count, "件")
+		for _, alert := range res.Alerts {
+			fmt.Println(alert.Month, "月", alert.Date, "日", alert.AlertType)
+		}
 	},
 }

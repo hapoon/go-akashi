@@ -11,9 +11,62 @@ import (
 
 // Alert アラート情報
 type Alert struct {
-	Month     string `json:"month"`      // アラートの発生した月度
-	Date      string `json:"date"`       // アラートの発生した日付
-	AlertType int    `json:"alert_type"` // アラート種別 1:打刻忘れ 2:欠勤疑い 3:休憩過少/超過 4:出勤打刻乖離 5:退勤打刻乖離 6:休日出勤 7:遅刻 8:早退 9:残業時間域値越え 10:無断出勤
+	Month     string    `json:"month"`      // アラートの発生した月度
+	Date      string    `json:"date"`       // アラートの発生した日付
+	AlertType AlertType `json:"alert_type"` // アラート種別
+}
+
+// AlertType アラート種別
+type AlertType int
+
+const (
+	// AlertTypeForgetStamp 打刻忘れ
+	AlertTypeForgetStamp AlertType = iota + 1
+	// AlertTypeMayBeAbsent 欠勤疑い
+	AlertTypeMayBeAbsent
+	// AlertTypeProblemInBreak 休憩過少/超過
+	AlertTypeProblemInBreak
+	// AlertTypeDivergenceGoToWork 出勤打刻乖離
+	AlertTypeDivergenceGoToWork
+	// AlertTypeDivergenceLeaveWork 退勤打刻乖離
+	AlertTypeDivergenceLeaveWork
+	// AlertTypeWorkHoliday 休日出勤
+	AlertTypeWorkHoliday
+	// AlertTypeLateness 遅刻
+	AlertTypeLateness
+	// AlertTypeLeaveEarly 早退
+	AlertTypeLeaveEarly
+	// AlertTypeExceedThresholdOvertime 残業時間域値越え
+	AlertTypeExceedThresholdOvertime
+	// AlertTypeGoToWorkWithoutPermission 無断出勤
+	AlertTypeGoToWorkWithoutPermission
+)
+
+func (a AlertType) String() string {
+	switch a {
+	case AlertTypeForgetStamp:
+		return "打刻忘れ"
+	case AlertTypeMayBeAbsent:
+		return "欠勤疑い"
+	case AlertTypeProblemInBreak:
+		return "休憩過少/超過"
+	case AlertTypeDivergenceGoToWork:
+		return "出勤打刻乖離"
+	case AlertTypeDivergenceLeaveWork:
+		return "退勤打刻乖離"
+	case AlertTypeWorkHoliday:
+		return "休日出勤"
+	case AlertTypeLateness:
+		return "遅刻"
+	case AlertTypeLeaveEarly:
+		return "早退"
+	case AlertTypeExceedThresholdOvertime:
+		return "残業時間域値越え"
+	case AlertTypeGoToWorkWithoutPermission:
+		return "無断出勤"
+	default:
+		return ""
+	}
 }
 
 // GetAlertParam アラート情報取得リクエストパラメータ
